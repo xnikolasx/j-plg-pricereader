@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<install version="1.5" type="plugin" group="content" method="upgrade">
+  <name>Smart Price</name>
+  <author>Jookolas</author>
+  <authorEmail>owner@jookolas.ru</authorEmail>
+  <authorUrl>www.jookolas.ru</authorUrl>
+  <copyright>Copyright (c) 2013. All rights reserved.</copyright>
+  <creationDate>2013</creationDate>
+  <license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
+  <version>0.1</version>
+  <description>Отображение цены через Тег</description>
+  <files>
+    <filename plugin="smart_price">smart_price.php</filename>
+  </files>
+</install>
