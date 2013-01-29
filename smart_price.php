@@ -82,9 +82,7 @@ class plgContentSmart_price extends JPlugin {
                 
                 $price = "<Несуществующая цена>";
                 if(isset($data[$type][$id]))
-                    $price = ($type == 'base') ? 
-                        $data[$type][$id][$column + 2] :
-                        $data[$type][$id][$column + 1];
+                    $price = $data[$type][$id][$column + 2];
                 
                 $current_template = str_replace("{price_value}", $price, $current_template);
 
