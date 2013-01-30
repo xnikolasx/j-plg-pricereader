@@ -37,11 +37,6 @@ class plgContentPrice_reader extends JPlugin {
 
     // The main function
     function renderTS(&$row, &$params, $page = 0) {
-
-        echo "LOADED";
-        echo "<pre>";
-        var_dump($this);
-        echo "</pre>";
         // Simple performance checks to determine whether plugin should process further
         if (!preg_match("#{price=.+?}#s", $row->text))
             return;
@@ -107,6 +102,8 @@ class plgContentPrice_reader extends JPlugin {
      * @return mixed - массив со строками из таблицы или false
      */
     private function _load_data($ids = array(), $table = 'base') {
+        if(count($ids) == 0)
+            return false;
         // Подготовка входных данных
         $table_name = "#__pricelist" . $table;
         $id_list = join(',', $ids);
