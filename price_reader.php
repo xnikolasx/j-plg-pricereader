@@ -42,17 +42,11 @@ class plgContentPrice_reader extends JPlugin {
             return;
 
         //  Шаблон для замены цены
-        $price_template = "
-				<p class='cena'>
-					{price_desription} 
-					<span class='rur'>
-						{price_value} руб.
-					</span>
-				</p>
-			";
+        $descr_tmpl = "<span class='des'>{price_description}</span> ";
+        $price_tmpl = "<span class='rur'>{price_value} руб.</span>";
 
         //	Проверка на соответствие формату
-        //                0         1              2                  3        4       5
+        //                0         1              2                  3        4      5
         if (preg_match_all('/{price=(\d{1,2}) type=(base|city) column=(\d{1,2})( des="([^"]*)")?}/u', $row->text, $matches, PREG_PATTERN_ORDER) > 0) {
             $counter = 0;
 
@@ -70,23 +64,24 @@ class plgContentPrice_reader extends JPlugin {
             unset($city_id_list);
 
             foreach ($matches[0] as $full_match) {
-                // Подстановка описания цены
-                $price_description = (!empty($matches[5][$counter])) ? $matches[5][$counter] : "";
-                $current_template = str_replace("{price_desription}", $price_description, $price_template);
+                // Подстановка описания, если есть
+                $descr_tag = (!empty($matches[5][$counter])) ? 
+                    str_replace("{price_description}", $matches[5][$counter],
+                            $descr_tmpl) : false;
 
                 // Подстановка значения цены
                 $id = $matches[1][$counter];
                 $type = $matches[2][$counter];
                 $column = $matches[3][$counter];
+                $value_tag = (isset($data[$type][$id])) ?
+                    str_replace("{price_value}", $data[$type][$id][$column + 2],
+                            $price_tmpl) : "0";
+                
+                // Склейка в блок
+                $full_block = ($descr_tag) ? $descr_tag . $value_tag : $value_tag;
 
-                $price = "<Несуществующая цена>";
-                if (isset($data[$type][$id]))
-                    $price = $data[$type][$id][$column + 2];
-
-                $current_template = str_replace("{price_value}", $price, $current_template);
-
-                // Замена полного соответствия на шаблон
-                $row->text = str_replace($full_match, $current_template, $row->text);
+                // Замена полного соответствия на блок
+                $row->text = str_replace($full_match, $full_block, $row->text);
 
                 $counter++;
             }
