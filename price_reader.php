@@ -65,18 +65,19 @@ class plgContentPrice_reader extends JPlugin {
 
             foreach ($matches[0] as $full_match) {
                 // Подстановка описания, если есть
-                $descr_tag = (!empty($matches[5][$counter])) ? 
-                    str_replace("{price_description}", $matches[5][$counter],
-                            $descr_tmpl) : false;
+                $descr_tag = (!empty($matches[5][$counter])) ?
+                        str_replace("{price_description}", $matches[5][$counter], $descr_tmpl) : false;
 
                 // Подстановка значения цены
                 $id = $matches[1][$counter];
                 $type = $matches[2][$counter];
                 $column = $matches[3][$counter];
-                $value_tag = (isset($data[$type][$id])) ?
-                    str_replace("{price_value}", $data[$type][$id][$column + 2],
-                            $price_tmpl) : "0";
-                
+                $price = "0";
+                if (isset($data[$type][$id]) && isset($data[$type][$id][$column + 2])) {
+                    $price = $this->_format_price($data[$type][$id][$column + 2]);
+                }
+                $value_tag = str_replace("{price_value}", $price, $price_tmpl);
+
                 // Склейка в блок
                 $full_block = ($descr_tag) ? $descr_tag . $value_tag : $value_tag;
 
@@ -97,7 +98,7 @@ class plgContentPrice_reader extends JPlugin {
      * @return mixed - массив со строками из таблицы или false
      */
     private function _load_data($ids = array(), $table = 'base') {
-        if(count($ids) == 0)
+        if (count($ids) == 0)
             return false;
         // Подготовка входных данных
         $table_name = "#__pricelist" . $table;
@@ -136,6 +137,27 @@ class plgContentPrice_reader extends JPlugin {
 
         // Убирает дубликаты и возвращает результат
         return array_unique($result);
+    }
+
+    /**
+     * Форматирует цену, добавляя разделитель между разрядами
+     * @param string $price - цена
+     * @param string $delimiter - разделитель разрядов
+     * @return string - отформатированная цена
+     */
+    private function _format_price($price, $delimiter = ' ') {
+        $new_price = $price;
+        $triples_count = strlen($price) / 3;
+        if ($triples_count > 0) {
+            $new_price = '';
+            for ($n = 1; $n <= ceil($triples_count); $n++) {
+                $part = substr($price, -3);
+                $new_price = $part . $delimiter . $new_price;
+                $price = substr($price, 0, -3);
+            }
+            echo trim($new_price);
+        }
+        return $new_price;
     }
 
 }
